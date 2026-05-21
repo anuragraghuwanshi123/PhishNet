@@ -8,20 +8,19 @@ services:
     environment:
       - API_KEY=demo-key
       - JWT_SECRET_KEY=secret
-      - REDIS_URL=redis://redis:6379
+      
     depends_on:
-      - redis
+      
       - prometheus
     networks:
       - backend
 
-  redis:
-    image: redis:alpine
-    container_name: phishnet-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - backend
+  #redis:
+   # container_name: phishnet-redis
+   # ports:
+   #   - "6379:6379"
+    #networks:
+    #  - backend
 
   prometheus:
     image: prom/prometheus:latest
