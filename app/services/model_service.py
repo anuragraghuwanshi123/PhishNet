@@ -43,6 +43,12 @@ def _predict_probability(input_pca, model_name: str):
         phishing_index = classes.index(phishing_class)
         return float(svm_model.predict_proba(input_pca)[0][phishing_index])
 
+    elif model_name == "XGBoost":
+        classes = list(xgb_model.classes_)
+        phishing_class = 0 if 0 in classes else -1
+        phishing_index = classes.index(phishing_class)
+        return float(xgb_model.predict_proba(input_pca)[0][phishing_index])
+
     else:
         classes = list(rf_model.classes_)
         phishing_class = 0 if 0 in classes else -1
@@ -53,9 +59,13 @@ def _predict_probability(input_pca, model_name: str):
 def predict_phishing(url: str, model_name: str = "Random Forest"):
     cache_key = make_cache_key(url, model_name)
 
-    cached = get_cached_prediction(cache_key)
-    if cached:
-        return cached
+    # Redis cache is optional
+    try:
+        cached = get_cached_prediction(cache_key)
+        if cached is not None:
+            return cached
+    except Exception as e:
+        print(f"Redis cache read skipped: {e}")
 
     features_dict, feature_array = extract_all_features(url)
 
@@ -78,15 +88,16 @@ def predict_phishing(url: str, model_name: str = "Random Forest"):
         "features": features_dict
     }
 
-    set_cached_prediction(cache_key, result)
+    # Redis cache is optional
+    try:
+        set_cached_prediction(cache_key, result)
+    except Exception as e:
+        print(f"Redis cache write skipped: {e}")
 
     return result
 
 
-def predict_manual_features(
-    features: list,
-    model_name: str = "Random Forest"
-):
+def predict_manual_features(features: list, model_name: str = "Random Forest"):
     input_array = np.array(features).reshape(1, -1)
     input_scaled = scaler.transform(input_array)
     input_pca = pca.transform(input_scaled)
@@ -113,19 +124,13 @@ def predict_batch_csv(file, model_name: str = "Random Forest"):
     if "url" in df.columns:
         for url in df["url"]:
             results.append(
-                predict_phishing(
-                    str(url),
-                    model_name
-                )
+                predict_phishing(str(url), model_name)
             )
     else:
         for _, row in df.iterrows():
             features = row.tolist()
             results.append(
-                predict_manual_features(
-                    features,
-                    model_name
-                )
+                predict_manual_features(features, model_name)
             )
 
     return {
@@ -135,7 +140,18 @@ def predict_batch_csv(file, model_name: str = "Random Forest"):
 
 
 def evaluate_model(model_name: str = "Random Forest"):
+    safe_model_name = model_name.lower().replace(" ", "_")
+
     return {
-        "message": "Model evaluation reports are available in reports folder.",
-        "model_name": model_name
+        "model_name": model_name,
+        "message": "Model evaluation reports available.",
+        "reports": {
+            "model_summary": "/reports/model_summary.csv",
+            "feature_summary": "/reports/feature_value_summary.csv",
+            "roc_curve": "/reports/roc_curve_comparison.png",
+            "model_comparison": "/reports/model_comparison_auc_accuracy.png",
+            "class_distribution": "/reports/class_distribution.png",
+            "correlation_heatmap": "/reports/correlation_heatmap.png",
+            "confusion_matrix": f"/reports/{safe_model_name}_confusion_matrix.png"
+        }
     }

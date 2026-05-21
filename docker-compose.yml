@@ -2,9 +2,9 @@
 services:
   api:
     build: .
-    container_name: fastapi-app
+    container_name: phishnet-api
     ports:
-      - "8001:8000"
+      - "8002:8000"
     environment:
       - API_KEY=demo-key
       - JWT_SECRET_KEY=secret
@@ -17,7 +17,7 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: redis1
+    container_name: phishnet-redis
     ports:
       - "6379:6379"
     networks:
@@ -25,7 +25,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus1
+    container_name: phishnet-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -35,7 +35,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana1
+    container_name: phishnet-grafana
     ports:
       - "3000:3000"
     depends_on:
