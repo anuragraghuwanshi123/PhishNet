@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: phishnet-api
+    env: docker
+    plan: free
+    branch: main
+    autoDeploy: true
+
+    dockerfilePath: ./Dockerfile
+
+    envVars:
+      - key: MODEL_PATH
+        value: app/models/phishing_model.joblib
+
+      - key: SCALER_PATH
+        value: app/models/scaler.pkl
+
+      - key: PCA_PATH
+        value: app/models/pca.pkl
+      
+      - key: ANN_MODEL_PATH
+        value: app/models/ann_model.h5
+
+      

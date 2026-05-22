@@ -47,10 +47,7 @@ class Settings:
         "app/models/ann_model.h5"
     )
 
-    XGB_MODEL_PATH = os.getenv(
-    "XGB_MODEL_PATH",
-    "app/models/xgb_model.pkl"
-)
+    
 
     DATASET_PATH = os.getenv(
         "DATASET_PATH",

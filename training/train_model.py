@@ -798,7 +798,6 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from xgboost import XGBClassifier
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -966,23 +965,6 @@ def train_svm(X_train, y_train, model_dir="models"):
     joblib.dump(svm_model, svm_path)
     print(f"SVM model saved at {svm_path}")
     return svm_model
-
-
-def train_xgboost(X_train, y_train, model_dir="models"):
-    xgb_model = XGBClassifier(
-        n_estimators=100,
-        learning_rate=0.1,
-        max_depth=6,
-        random_state=42,
-        eval_metric="logloss"
-    )
-
-    xgb_model.fit(X_train, y_train)
-
-    xgb_path = os.path.join(model_dir, "xgb_model.pkl")
-    joblib.dump(xgb_model, xgb_path)
-    print(f"XGBoost model saved at {xgb_path}")
-    return xgb_model
 
 
 def positive_class_probability(model, X):
@@ -1199,7 +1181,7 @@ def main():
     parser.add_argument("--models-dir", default="app/models", help="Directory to save trained models")
     parser.add_argument("--reports-dir", default="reports", help="Directory to save EDA/evaluation reports")
     parser.add_argument("--url", default=None, help="Optional URL to scan after training")
-    parser.add_argument("--model", default="Random Forest", choices=["ANN", "Random Forest", "SVM", "XGBoost"])
+    parser.add_argument("--model", default="Random Forest", choices=["ANN", "Random Forest", "SVM"])
     args = parser.parse_args()
 
     os.makedirs(args.models_dir, exist_ok=True)
@@ -1230,13 +1212,13 @@ def main():
     ann_model = train_ann(X_train, y_train, model_dir=args.models_dir)
     rf_model = train_random_forest(X_train, y_train, model_dir=args.models_dir)
     svm_model = train_svm(X_train, y_train, model_dir=args.models_dir)
-    xgb_model = train_xgboost(X_train, y_train, model_dir=args.models_dir)
+    
 
     models = {
         "ANN": ann_model,
         "Random Forest": rf_model,
-        "SVM": svm_model,
-        "XGBoost": xgb_model
+        "SVM": svm_model
+        
     }
 
     evaluate_models(models, X_test, y_test, output_dir=args.reports_dir)

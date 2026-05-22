@@ -14,7 +14,7 @@ svm_model = joblib.load(settings.SVM_MODEL_PATH)
 scaler = joblib.load(settings.SCALER_PATH)
 pca = joblib.load(settings.PCA_PATH)
 ann_model = load_model(settings.ANN_MODEL_PATH)
-xgb_model = joblib.load(settings.XGB_MODEL_PATH)
+
 
 
 def make_cache_key(url: str, model_name: str):
@@ -43,11 +43,7 @@ def _predict_probability(input_pca, model_name: str):
         phishing_index = classes.index(phishing_class)
         return float(svm_model.predict_proba(input_pca)[0][phishing_index])
 
-    elif model_name == "XGBoost":
-        classes = list(xgb_model.classes_)
-        phishing_class = 0 if 0 in classes else -1
-        phishing_index = classes.index(phishing_class)
-        return float(xgb_model.predict_proba(input_pca)[0][phishing_index])
+    
 
     else:
         classes = list(rf_model.classes_)

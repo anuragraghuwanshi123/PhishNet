@@ -23,8 +23,8 @@ def root():
     return {'message': 'PhishNet API is running'}
 
 # link endpoints
-app.include_router(routes_auth.router, prefix='/auth', tags=['Auth'])
-app.include_router(routes_predict.router, tags=['Prediction'])
+app.include_router(routes_auth.router, prefix='/auth', tags=['Auth']) # it shows authentication section in api
+app.include_router(routes_predict.router, tags=['Prediction']) # it shows main prediction section in api
 
 # monitoring using Prometheus
 Instrumentator().instrument(app).expose(app)
