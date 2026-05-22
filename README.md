@@ -12,7 +12,7 @@ A production-grade phishing detection system that extracts **30 URL-based featur
 👉 [https://phishnet-erwz2a34gdc7yxbhujzkpl.streamlit.app](https://phishnet-erwz2a34gdc7yxbhujzkpl.streamlit.app)
 
 ⚙️ **FastAPI Backend:**
-👉 [https://phishnet-t6pj.onrender.com/docs](https://phishnet-t6pj.onrender.com/docs)
+👉 [https://phishnet-t6pj.onrender.com](https://phishnet-t6pj.onrender.com)
 
 ---
 
@@ -32,7 +32,7 @@ Designed for cybersecurity analysts, IT teams, and end users who need fast, reli
 ## 🖼️ Application Screenshots
 
 ### URL Auto-Scan Interface
-![PhishNet UI](screenshots/phishnet_ui.png)
+![PhishNet UI](Screeshots/phishnet_ui.png)
 
 *Enter any URL and the app automatically extracts all 30 phishing-detection features and runs them through your chosen model.*
 
@@ -70,13 +70,13 @@ All three models were trained and evaluated on a labeled phishing dataset with 3
 
 ### ROC Curve Comparison
 
-![ROC Curve](screenshots/roc_curve.png)
+![ROC Curve](Screeshots/roc_curve.png)
 
 *All three models achieve AUC > 0.98, indicating excellent discrimination between phishing and legitimate sites.*
 
 ### AUC vs Accuracy Bar Chart
 
-![AUC vs Accuracy](screenshots/auc_vs_accuracy.png)
+![AUC vs Accuracy](Screeshots/auc_vs_accuracy.png)
 
 *Grouped bar chart comparing AUC Score (%) and Accuracy (%) across all three models.*
 
@@ -207,6 +207,10 @@ PhishNet/
 ├── training/
 │   ├── train_model.py         # Model training scripts
 │   └── train_utils.py
+├── Screeshots/
+│   ├── phishnet_ui.png        # App UI screenshot
+│   ├── roc_curve.png          # ROC curve comparison
+│   └── auc_vs_accuracy.png    # AUC vs Accuracy bar chart
 ├── .dockerignore
 ├── .env
 ├── .gitignore
