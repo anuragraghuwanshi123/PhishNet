@@ -68,13 +68,13 @@ All three models were trained and evaluated on a labeled phishing dataset with 3
 
 > **Random Forest** achieves the best overall performance with AUC = 0.990 and accuracy of 95.79%.
 
-### ROC Curve Comparison
+### AUC vs Accuracy Bar Chart
 
 ![ROC Curve](Screeshots/roc_curve.png)
 
 *All three models achieve AUC > 0.98, indicating excellent discrimination between phishing and legitimate sites.*
 
-### AUC vs Accuracy Bar Chart
+### ROC Curve Comparison
 
 ![AUC vs Accuracy](Screeshots/auc_vs_accuracy.png)
 
