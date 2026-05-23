@@ -1,6 +1,5 @@
 import requests
 import streamlit as st
-import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -660,9 +659,16 @@ with tab1:
                     data = parse_api_response(resp.json())
 
                     if isinstance(data, dict):
-                        raw_prob     = data.get("phishing_probability",
-                                       data.get("phishing_prob",
-                                       data.get("probability", 0.5)))
+                        # FIX: Use None sentinel so we can detect a missing key
+                        # and fall back to the label string rather than 0.5
+                        raw_prob = data.get("phishing_probability",
+                                   data.get("phishing_prob",
+                                   data.get("probability", None)))
+                        if raw_prob is None:
+                            label_str = str(data.get("prediction",
+                                            data.get("label",
+                                            data.get("result", "")))).lower()
+                            raw_prob = 1.0 if "phish" in label_str else 0.0
                         features_raw = data.get("features", {})
                     else:
                         raw_prob     = 1.0 if "phish" in str(data).lower() else 0.0
@@ -721,9 +727,16 @@ with tab2:
                 data = parse_api_response(resp.json())
 
                 if isinstance(data, dict):
+                    # FIX: Use None sentinel so we can detect a missing key
+                    # and fall back to the label string rather than 0.5
                     raw_prob = data.get("phishing_probability",
                                data.get("phishing_prob",
-                               data.get("probability", 0.5)))
+                               data.get("probability", None)))
+                    if raw_prob is None:
+                        label_str = str(data.get("prediction",
+                                        data.get("label",
+                                        data.get("result", "")))).lower()
+                        raw_prob = 1.0 if "phish" in label_str else 0.0
                 else:
                     raw_prob = 1.0 if "phish" in str(data).lower() else 0.0
 
@@ -1050,3 +1063,4 @@ with tab4:
                     plt.tight_layout(pad=1.5)
                     st.pyplot(fig)
                     plt.close(fig)
+
