@@ -796,41 +796,49 @@ with tab3:
 
 
 # ──────────────────────────────────────────────────────────────
-# TAB 4 — Model Evaluation  (matches deployed screenshot exactly)
+# TAB 4 — Model Evaluation with 3 inner sub-tabs
 # ──────────────────────────────────────────────────────────────
 with tab4:
 
     if "eval_data" not in st.session_state:
         st.session_state.eval_data = {}
 
-    if st.button("📊 Load Evaluation", key="load_eval"):
-        with st.spinner(f"Fetching evaluation for {model_choice}…"):
-            try:
-                resp = requests.get(
-                    f"{API_BASE}/model/evaluation",
-                    params={"model_name": model_choice},
-                    timeout=TIMEOUT
-                )
-                resp.raise_for_status()
-                st.session_state.eval_data[model_choice] = parse_api_response(resp.json())
-                st.success(f"✅ Evaluation loaded for **{model_choice}**")
-            except requests.exceptions.Timeout:
-                st.error("⏳ Timed out. Retry in ~30 s.")
-            except requests.exceptions.HTTPError as e:
-                st.error(f"HTTP {e.response.status_code}: {e.response.text}")
-            except Exception as e:
-                st.error(f"⚠️ Error: {e}")
+    # ── 3 inner sub-tabs always visible ──────────────────────
+    eval_tab1, eval_tab2, eval_tab3 = st.tabs([
+        "📈 ROC Curve",
+        "📋 Confusion Matrix & Report",
+        "📊 Final Model Summary"
+    ])
 
-    data = st.session_state.eval_data.get(model_choice)
+    # ══════════════════════════════════════════════════════════
+    # SUB-TAB 1 — ROC Curve
+    # ══════════════════════════════════════════════════════════
+    with eval_tab1:
+        st.markdown('<div class="sec-heading">ROC Curve</div>', unsafe_allow_html=True)
+        st.caption("Load the ROC curve for the currently selected model.")
 
-    if data and isinstance(data, dict):
-        reports = data.get("reports", {})
+        if st.button("📊 Load Evaluation", key="load_eval_roc"):
+            with st.spinner(f"Fetching evaluation for {model_choice}…"):
+                try:
+                    resp = requests.get(
+                        f"{API_BASE}/model/evaluation",
+                        params={"model_name": model_choice},
+                        timeout=TIMEOUT
+                    )
+                    resp.raise_for_status()
+                    st.session_state.eval_data[model_choice] = parse_api_response(resp.json())
+                    st.success(f"✅ Loaded for **{model_choice}**")
+                except requests.exceptions.Timeout:
+                    st.error("⏳ Timed out. Retry in ~30 s.")
+                except requests.exceptions.HTTPError as e:
+                    st.error(f"HTTP {e.response.status_code}: {e.response.text}")
+                except Exception as e:
+                    st.error(f"⚠️ Error: {e}")
 
-        # ── 📈 ROC Curve ──────────────────────────────────────
-        st.header("📈 ROC Curve")
-        show_roc = st.checkbox("Show ROC Curve for Test Set", key="cb_roc", value=False)
-        if show_roc:
-            roc_path = reports.get("roc_curve")
+        data_roc = st.session_state.eval_data.get(model_choice)
+        if data_roc and isinstance(data_roc, dict):
+            reports_roc = data_roc.get("reports", {})
+            roc_path = reports_roc.get("roc_curve")
             if roc_path:
                 img = fetch_image_from_api(roc_path)
                 if img:
@@ -838,9 +846,9 @@ with tab4:
                 else:
                     st.warning("Could not load ROC curve image from API.")
             else:
-                fpr     = data.get("fpr", [])
-                tpr     = data.get("tpr", [])
-                auc_val = data.get("auc", data.get("roc_auc"))
+                fpr     = data_roc.get("fpr", [])
+                tpr     = data_roc.get("tpr", [])
+                auc_val = data_roc.get("auc", data_roc.get("roc_auc"))
                 if fpr and tpr:
                     fig, ax = plt.subplots(figsize=(7, 4.5))
                     lbl = f"ROC curve (AUC = {auc_val:.2f})" if auc_val else "ROC curve"
@@ -857,14 +865,39 @@ with tab4:
                 else:
                     st.info("No ROC curve data available for this model.")
 
-        # ── 📋 Confusion Matrix & Classification Report ───────
-        st.header("📋 Confusion Matrix & Classification Report")
-        show_cm = st.checkbox("Show Confusion Matrix and Classification Report", key="cb_cm", value=False)
-        if show_cm:
-            # Classification report — from inline dict first
-            if "classification_report" in data:
-                st.markdown("### Classification Report")
-                report = data["classification_report"]
+    # ══════════════════════════════════════════════════════════
+    # SUB-TAB 2 — Confusion Matrix & Classification Report
+    # ══════════════════════════════════════════════════════════
+    with eval_tab2:
+        st.markdown('<div class="sec-heading">Confusion Matrix & Classification Report</div>', unsafe_allow_html=True)
+        st.caption("Load the confusion matrix and classification report for the selected model.")
+
+        if st.button("📊 Load Evaluation", key="load_eval_cm"):
+            with st.spinner(f"Fetching evaluation for {model_choice}…"):
+                try:
+                    resp = requests.get(
+                        f"{API_BASE}/model/evaluation",
+                        params={"model_name": model_choice},
+                        timeout=TIMEOUT
+                    )
+                    resp.raise_for_status()
+                    st.session_state.eval_data[model_choice] = parse_api_response(resp.json())
+                    st.success(f"✅ Loaded for **{model_choice}**")
+                except requests.exceptions.Timeout:
+                    st.error("⏳ Timed out. Retry in ~30 s.")
+                except requests.exceptions.HTTPError as e:
+                    st.error(f"HTTP {e.response.status_code}: {e.response.text}")
+                except Exception as e:
+                    st.error(f"⚠️ Error: {e}")
+
+        data_cm = st.session_state.eval_data.get(model_choice)
+        if data_cm and isinstance(data_cm, dict):
+            reports_cm = data_cm.get("reports", {})
+
+            # Classification report — inline dict first, then CSV fallback
+            if "classification_report" in data_cm:
+                st.markdown("**Classification Report**")
+                report = data_cm["classification_report"]
                 if isinstance(report, dict):
                     st.dataframe(
                         pd.DataFrame(report).transpose().style.format("{:.4f}"),
@@ -873,12 +906,11 @@ with tab4:
                 else:
                     st.text(report)
             else:
-                # Fall back to model_summary CSV
-                summary_path = reports.get("model_summary")
+                summary_path = reports_cm.get("model_summary")
                 if summary_path:
                     df_s = fetch_csv_from_api(summary_path)
                     if df_s is not None and not df_s.empty:
-                        st.markdown("### Classification Report")
+                        st.markdown("**Classification Report**")
                         st.dataframe(
                             df_s.style.format(
                                 {c: "{:.4f}" for c in df_s.select_dtypes("number").columns}
@@ -886,14 +918,14 @@ with tab4:
                             use_container_width=True
                         )
 
-            # Confusion matrix — image from API first, then inline array
-            cm_path = reports.get("confusion_matrix")
+            # Confusion matrix image first, then inline array
+            cm_path = reports_cm.get("confusion_matrix")
             if cm_path:
                 img = fetch_image_from_api(cm_path)
                 if img:
                     st.image(img, use_container_width=True)
-            elif "confusion_matrix" in data:
-                cm = np.array(data["confusion_matrix"])
+            elif "confusion_matrix" in data_cm:
+                cm = np.array(data_cm["confusion_matrix"])
                 fig, ax = plt.subplots(figsize=(5, 4))
                 im = ax.imshow(cm, cmap="Blues")
                 ax.set_xticks([0,1]); ax.set_yticks([0,1])
@@ -909,19 +941,18 @@ with tab4:
                 st.pyplot(fig)
                 plt.close(fig)
 
-    elif data:
-        st.info(str(data))
+    # ══════════════════════════════════════════════════════════
+    # SUB-TAB 3 — Final Model Performance Summary
+    # ══════════════════════════════════════════════════════════
+    with eval_tab3:
+        st.markdown('<div class="sec-heading">Final Model Performance Summary</div>', unsafe_allow_html=True)
+        st.caption("Compare all three models side by side.")
 
-    # ── 📊 Final Model Performance Summary ───────────────────
-    st.header("📊 Final Model Performance Summary")
-    show_summary = st.checkbox("Show Summary Comparison for All Models", key="cb_summary", value=False)
-
-    if show_summary:
-        # Auto-fetch any missing models silently
-        missing = [m for m in MODEL_OPTIONS if m not in st.session_state.eval_data]
-        if missing:
-            with st.spinner("Loading all model data…"):
-                for m in missing:
+        if st.button("🔄 Load All Models Data", key="compare_all"):
+            progress = st.progress(0, text="Starting…")
+            for idx, m in enumerate(MODEL_OPTIONS):
+                if m not in st.session_state.eval_data:
+                    progress.progress(idx / len(MODEL_OPTIONS), text=f"Fetching {m}…")
                     try:
                         r = requests.get(f"{API_BASE}/model/evaluation",
                                          params={"model_name": m}, timeout=TIMEOUT)
@@ -929,13 +960,15 @@ with tab4:
                         st.session_state.eval_data[m] = parse_api_response(r.json())
                     except Exception as e:
                         st.session_state.eval_data[m] = {"error": str(e)}
+                progress.progress((idx + 1) / len(MODEL_OPTIONS), text=f"Done: {m}")
+            progress.empty()
+            st.success("✅ All model data loaded.")
 
-        # ── Only render once ALL models are available ─────────
+        # Only render once ALL models are available
         all_fetched = all(m in st.session_state.eval_data for m in MODEL_OPTIONS)
         if not all_fetched:
-            st.info("Could not load all model data. Please try again.")
+            st.info("Click **Load All Models Data** above to compare all three models.")
         else:
-            # Build rows
             rows = []
             for m in MODEL_OPTIONS:
                 d = st.session_state.eval_data.get(m, {})
@@ -967,11 +1000,9 @@ with tab4:
                     display_rows.append(dr)
 
                 cmp_df = pd.DataFrame(display_rows).set_index("Model")
-
-                # Plain st.dataframe — matches screenshot exactly
                 st.dataframe(cmp_df, use_container_width=True)
 
-                # ── Bar chart — All Metrics Overview ─────────
+                # Bar chart — All Metrics Overview
                 all_metric_cols = list(cmp_df.columns)
                 if all_metric_cols and not cmp_df.empty:
                     cmp_plot = cmp_df[all_metric_cols].copy()
