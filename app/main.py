@@ -29,7 +29,8 @@ app.include_router(routes_predict.router, tags=['Prediction']) # it shows main p
 
 # CORS (allows React dashboard to connect) 
 app.add_middleware( CORSMiddleware,
-                    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], )
+                    allow_origins=["*"],allow_credentials=True,
+                    allow_methods=["*"], allow_headers=["*"], )
 
 # monitoring using Prometheus
 Instrumentator().instrument(app).expose(app)
