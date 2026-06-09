@@ -1,8 +1,4 @@
-# ============================================================
-# PhishNet - Automatic Feature Extraction from URL
-# ============================================================
-# Install required libraries:
-# pip install requests beautifulsoup4 python-whois dnspython
+
 import os
 import re
 import ssl
@@ -16,10 +12,7 @@ from datetime import datetime
 import pandas as pd
 
 
-# ============================================================
-# HELPER FUNCTIONS
-# ============================================================
-
+# helper functions
 def get_domain(url):
     """Extract domain from URL"""
     parsed = urlparse(url)
@@ -36,9 +29,9 @@ def get_soup(url):
         return None, None
 
 
-# ============================================================
+
 # FEATURE 1: UsingIP
-# ============================================================
+
 def using_ip(url):
     ip_pattern = re.compile(
         r'(([01]?\d\d?|2[0-4]\d|25[0-5])\.){3}([01]?\d\d?|2[0-4]\d|25[0-5])'
@@ -49,9 +42,8 @@ def using_ip(url):
     return 1
 
 
-# ============================================================
 # FEATURE 2: LongURL
-# ============================================================
+
 def long_url(url):
     length = len(url)
     if length < 54:
@@ -61,9 +53,8 @@ def long_url(url):
     return -1
 
 
-# ============================================================
 # FEATURE 3: ShortURL
-# ============================================================
+
 def short_url(url):
     shortening_services = [
         'bit.ly', 'goo.gl', 'tinyurl.com', 't.co', 'ow.ly',
@@ -76,18 +67,16 @@ def short_url(url):
     return 1
 
 
-# ============================================================
 # FEATURE 4: Symbol@
-# ============================================================
+
 def symbol_at(url):
     if '@' in url:
         return -1
     return 1
 
 
-# ============================================================
 # FEATURE 5: Redirecting//
-# ============================================================
+
 def redirecting_double_slash(url):
     url_without_protocol = url.split('://')[1] if '://' in url else url
     if '//' in url_without_protocol:
@@ -95,9 +84,8 @@ def redirecting_double_slash(url):
     return 1
 
 
-# ============================================================
 # FEATURE 6: PrefixSuffix-
-# ============================================================
+
 def prefix_suffix(url):
     domain = get_domain(url)
     if '-' in domain:
@@ -105,9 +93,8 @@ def prefix_suffix(url):
     return 1
 
 
-# ============================================================
 # FEATURE 7: SubDomains
-# ============================================================
+
 def sub_domains(url):
     domain = get_domain(url)
     domain = domain.replace('www.', '')
@@ -118,10 +105,8 @@ def sub_domains(url):
         return 0
     return -1
 
-
-# ============================================================
 # FEATURE 8: HTTPS
-# ============================================================
+
 def https_check(url):
     domain = get_domain(url)
     try:
@@ -139,9 +124,8 @@ def https_check(url):
     return -1
 
 
-# ============================================================
 # FEATURE 9: DomainRegLen
-# ============================================================
+
 def domain_reg_len(url):
     domain = get_domain(url)
     try:
@@ -158,9 +142,8 @@ def domain_reg_len(url):
     return -1
 
 
-# ============================================================
 # FEATURE 10: Favicon
-# ============================================================
+
 def favicon(url):
     domain = get_domain(url)
     soup, _ = get_soup(url)
@@ -172,9 +155,8 @@ def favicon(url):
     return 1
 
 
-# ============================================================
 # FEATURE 11: NonStdPort
-# ============================================================
+
 def non_std_port(url):
     parsed = urlparse(url)
     port = parsed.port
@@ -184,9 +166,8 @@ def non_std_port(url):
     return 1
 
 
-# ============================================================
 # FEATURE 12: HTTPSDomainURL
-# ============================================================
+
 def https_domain_url(url):
     domain = get_domain(url)
     if 'https' in domain.lower():
@@ -194,9 +175,8 @@ def https_domain_url(url):
     return 1
 
 
-# ============================================================
 # FEATURE 13: RequestURL
-# ============================================================
+
 def request_url(url):
     domain = get_domain(url)
     soup, _ = get_soup(url)
@@ -225,9 +205,8 @@ def request_url(url):
     return -1
 
 
-# ============================================================
 # FEATURE 14: AnchorURL
-# ============================================================
+
 def anchor_url(url):
     domain = get_domain(url)
     soup, _ = get_soup(url)
@@ -256,9 +235,8 @@ def anchor_url(url):
     return -1
 
 
-# ============================================================
 # FEATURE 15: LinksInScriptTags
-# ============================================================
+
 def links_in_script_tags(url):
     domain = get_domain(url)
     soup, _ = get_soup(url)
@@ -286,9 +264,8 @@ def links_in_script_tags(url):
     return -1
 
 
-# ============================================================
 # FEATURE 16: ServerFormHandler
-# ============================================================
+
 def server_form_handler(url):
     domain = get_domain(url)
     soup, _ = get_soup(url)
@@ -307,9 +284,8 @@ def server_form_handler(url):
     return 1
 
 
-# ============================================================
 # FEATURE 17: InfoEmail
-# ============================================================
+
 def info_email(url):
     soup, response = get_soup(url)
     if not soup:
@@ -321,9 +297,8 @@ def info_email(url):
     return 1
 
 
-# ============================================================
 # FEATURE 18: AbnormalURL
-# ============================================================
+
 def abnormal_url(url):
     domain = get_domain(url)
     try:
@@ -339,9 +314,8 @@ def abnormal_url(url):
     return -1
 
 
-# ============================================================
 # FEATURE 19: WebsiteForwarding
-# ============================================================
+
 def website_forwarding(url):
     try:
         response = requests.get(url, timeout=10, allow_redirects=True)
@@ -355,9 +329,8 @@ def website_forwarding(url):
         return -1
 
 
-# ============================================================
 # FEATURE 20: StatusBarCust
-# ============================================================
+
 def status_bar_cust(url):
     soup, _ = get_soup(url)
     if not soup:
@@ -369,9 +342,8 @@ def status_bar_cust(url):
     return 1
 
 
-# ============================================================
 # FEATURE 21: DisableRightClick
-# ============================================================
+
 def disable_right_click(url):
     soup, _ = get_soup(url)
     if not soup:
@@ -383,9 +355,8 @@ def disable_right_click(url):
     return 1
 
 
-# ============================================================
 # FEATURE 22: UsingPopupWindow
-# ============================================================
+
 def using_popup_window(url):
     soup, _ = get_soup(url)
     if not soup:
@@ -397,9 +368,8 @@ def using_popup_window(url):
     return 1
 
 
-# ============================================================
 # FEATURE 23: IframeRedirection
-# ============================================================
+
 def iframe_redirection(url):
     soup, _ = get_soup(url)
     if not soup:
@@ -421,9 +391,8 @@ def iframe_redirection(url):
     return 1
 
 
-# ============================================================
 # FEATURE 24: AgeofDomain
-# ============================================================
+
 def age_of_domain(url):
     domain = get_domain(url)
     try:
@@ -440,9 +409,8 @@ def age_of_domain(url):
     return -1
 
 
-# ============================================================
 # FEATURE 25: DNSRecording
-# ============================================================
+
 def dns_recording(url):
     domain = get_domain(url)
     try:
@@ -452,9 +420,8 @@ def dns_recording(url):
         return -1
 
 
-# ============================================================
 # FEATURE 26: WebsiteTraffic
-# ============================================================
+
 def website_traffic(url):
     domain = get_domain(url)
     try:
@@ -476,9 +443,9 @@ def website_traffic(url):
     return -1
 
 
-# ============================================================
+
 # FEATURE 27: PageRank
-# ============================================================
+
 def page_rank(url):
     domain = get_domain(url)
     try:
@@ -498,9 +465,8 @@ def page_rank(url):
     return -1
 
 
-# ============================================================
 # FEATURE 28: GoogleIndex
-# ============================================================
+
 def google_index(url):
     try:
         search_url = f'https://www.google.com/search?q=site:{url}'
@@ -514,9 +480,8 @@ def google_index(url):
         return -1
 
 
-# ============================================================
 # FEATURE 29: LinksPointingToPage
-# ============================================================
+
 def links_pointing_to_page(url):
     try:
         domain = get_domain(url)
@@ -537,9 +502,8 @@ def links_pointing_to_page(url):
     return -1
 
 
-# ============================================================
 # FEATURE 30: StatsReport
-# ============================================================
+
 def stats_report(url):
     domain = get_domain(url)
     try:
@@ -558,11 +522,11 @@ def stats_report(url):
     return 1
 
 
-# ============================================================
+
 # MAIN FUNCTION: Extract ALL 30 Features from URL
-# ============================================================
+
 def extract_all_features(url):
-    print(f"\n🔍 Analyzing URL: {url}")
+    print(f"\n Analyzing URL: {url}")
     print("=" * 60)
 
     features = {}
@@ -570,94 +534,94 @@ def extract_all_features(url):
     print("Extracting features...")
 
     features['UsingIP']             = using_ip(url)
-    print(f"✓ Feature 1  - UsingIP: {features['UsingIP']}")
+    print(f" Feature 1  - UsingIP: {features['UsingIP']}")
 
     features['LongURL']             = long_url(url)
-    print(f"✓ Feature 2  - LongURL: {features['LongURL']}")
+    print(f" Feature 2  - LongURL: {features['LongURL']}")
 
     features['ShortURL']            = short_url(url)
-    print(f"✓ Feature 3  - ShortURL: {features['ShortURL']}")
+    print(f" Feature 3  - ShortURL: {features['ShortURL']}")
 
     features['Symbol@']             = symbol_at(url)
-    print(f"✓ Feature 4  - Symbol@: {features['Symbol@']}")
+    print(f" Feature 4  - Symbol@: {features['Symbol@']}")
 
     features['Redirecting//']       = redirecting_double_slash(url)
-    print(f"✓ Feature 5  - Redirecting//: {features['Redirecting//']}")
+    print(f" Feature 5  - Redirecting//: {features['Redirecting//']}")
 
     features['PrefixSuffix-']       = prefix_suffix(url)
-    print(f"✓ Feature 6  - PrefixSuffix-: {features['PrefixSuffix-']}")
+    print(f" Feature 6  - PrefixSuffix-: {features['PrefixSuffix-']}")
 
     features['SubDomains']          = sub_domains(url)
-    print(f"✓ Feature 7  - SubDomains: {features['SubDomains']}")
+    print(f" Feature 7  - SubDomains: {features['SubDomains']}")
 
     features['HTTPS']               = https_check(url)
-    print(f"✓ Feature 8  - HTTPS: {features['HTTPS']}")
+    print(f" Feature 8  - HTTPS: {features['HTTPS']}")
 
     features['DomainRegLen']        = domain_reg_len(url)
-    print(f"✓ Feature 9  - DomainRegLen: {features['DomainRegLen']}")
+    print(f" Feature 9  - DomainRegLen: {features['DomainRegLen']}")
 
     features['Favicon']             = favicon(url)
-    print(f"✓ Feature 10 - Favicon: {features['Favicon']}")
+    print(f" Feature 10 - Favicon: {features['Favicon']}")
 
     features['NonStdPort']          = non_std_port(url)
-    print(f"✓ Feature 11 - NonStdPort: {features['NonStdPort']}")
+    print(f" Feature 11 - NonStdPort: {features['NonStdPort']}")
 
     features['HTTPSDomainURL']      = https_domain_url(url)
-    print(f"✓ Feature 12 - HTTPSDomainURL: {features['HTTPSDomainURL']}")
+    print(f" Feature 12 - HTTPSDomainURL: {features['HTTPSDomainURL']}")
 
     features['RequestURL']          = request_url(url)
-    print(f"✓ Feature 13 - RequestURL: {features['RequestURL']}")
+    print(f" Feature 13 - RequestURL: {features['RequestURL']}")
 
     features['AnchorURL']           = anchor_url(url)
-    print(f"✓ Feature 14 - AnchorURL: {features['AnchorURL']}")
+    print(f" Feature 14 - AnchorURL: {features['AnchorURL']}")
 
     features['LinksInScriptTags']   = links_in_script_tags(url)
-    print(f"✓ Feature 15 - LinksInScriptTags: {features['LinksInScriptTags']}")
+    print(f" Feature 15 - LinksInScriptTags: {features['LinksInScriptTags']}")
 
     features['ServerFormHandler']   = server_form_handler(url)
-    print(f"✓ Feature 16 - ServerFormHandler: {features['ServerFormHandler']}")
+    print(f" Feature 16 - ServerFormHandler: {features['ServerFormHandler']}")
 
     features['InfoEmail']           = info_email(url)
-    print(f"✓ Feature 17 - InfoEmail: {features['InfoEmail']}")
+    print(f" Feature 17 - InfoEmail: {features['InfoEmail']}")
 
     features['AbnormalURL']         = abnormal_url(url)
-    print(f"✓ Feature 18 - AbnormalURL: {features['AbnormalURL']}")
+    print(f" Feature 18 - AbnormalURL: {features['AbnormalURL']}")
 
     features['WebsiteForwarding']   = website_forwarding(url)
-    print(f"✓ Feature 19 - WebsiteForwarding: {features['WebsiteForwarding']}")
+    print(f" Feature 19 - WebsiteForwarding: {features['WebsiteForwarding']}")
 
     features['StatusBarCust']       = status_bar_cust(url)
-    print(f"✓ Feature 20 - StatusBarCust: {features['StatusBarCust']}")
+    print(f" Feature 20 - StatusBarCust: {features['StatusBarCust']}")
 
     features['DisableRightClick']   = disable_right_click(url)
-    print(f"✓ Feature 21 - DisableRightClick: {features['DisableRightClick']}")
+    print(f" Feature 21 - DisableRightClick: {features['DisableRightClick']}")
 
     features['UsingPopupWindow']    = using_popup_window(url)
-    print(f"✓ Feature 22 - UsingPopupWindow: {features['UsingPopupWindow']}")
+    print(f" Feature 22 - UsingPopupWindow: {features['UsingPopupWindow']}")
 
     features['IframeRedirection']   = iframe_redirection(url)
-    print(f"✓ Feature 23 - IframeRedirection: {features['IframeRedirection']}")
+    print(f" Feature 23 - IframeRedirection: {features['IframeRedirection']}")
 
     features['AgeofDomain']         = age_of_domain(url)
-    print(f"✓ Feature 24 - AgeofDomain: {features['AgeofDomain']}")
+    print(f" Feature 24 - AgeofDomain: {features['AgeofDomain']}")
 
     features['DNSRecording']        = dns_recording(url)
-    print(f"✓ Feature 25 - DNSRecording: {features['DNSRecording']}")
+    print(f" Feature 25 - DNSRecording: {features['DNSRecording']}")
 
     features['WebsiteTraffic']      = website_traffic(url)
-    print(f"✓ Feature 26 - WebsiteTraffic: {features['WebsiteTraffic']}")
+    print(f" Feature 26 - WebsiteTraffic: {features['WebsiteTraffic']}")
 
     features['PageRank']            = page_rank(url)
-    print(f"✓ Feature 27 - PageRank: {features['PageRank']}")
+    print(f" Feature 27 - PageRank: {features['PageRank']}")
 
     features['GoogleIndex']         = google_index(url)
-    print(f"✓ Feature 28 - GoogleIndex: {features['GoogleIndex']}")
+    print(f" Feature 28 - GoogleIndex: {features['GoogleIndex']}")
 
     features['LinksPointingToPage'] = links_pointing_to_page(url)
-    print(f"✓ Feature 29 - LinksPointingToPage: {features['LinksPointingToPage']}")
+    print(f" Feature 29 - LinksPointingToPage: {features['LinksPointingToPage']}")
 
     features['StatsReport']         = stats_report(url)
-    print(f"✓ Feature 30 - StatsReport: {features['StatsReport']}")
+    print(f" Feature 30 - StatsReport: {features['StatsReport']}")
 
     feature_array = [
         features['UsingIP'],
@@ -695,9 +659,8 @@ def extract_all_features(url):
     return features, feature_array
 
 
-# ============================================================
-# PhishNet - EDA + Training + Evaluation Pipeline
-# ============================================================
+# EDA + Training + Evaluation Pipeline
+
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -802,20 +765,7 @@ def prepare_data(df, pca_components=16, model_dir="models"):
     X = df.drop(["Index", "class"], axis=1, errors="ignore")
     y = df["class"].copy()
 
-    # ──────────────────────────────────────────────────────────
-    # BUG FIX 1: Remap labels to strict binary {0, 1}
-    #
-    # The original dataset uses -1 (phishing) and 1 (legitimate).
-    # Keras binary_crossentropy requires labels in {0, 1}.
-    # Without this remap:
-    #   • Keras treats -1 as a valid target → loss behaves incorrectly
-    #   • ANN learns an inverted or noisy decision boundary
-    #   • RF/SVM classes_ contain -1, making phishing-index lookup wrong
-    #
-    # Mapping:  -1 → 0  (phishing)
-    #            0 → 0  (suspicious, treated as phishing)
-    #            1 → 1  (legitimate)
-    # ──────────────────────────────────────────────────────────
+    
     y = y.map({-1: 0, 0: 0, 1: 1})
 
     print("\nRemapped class distribution (0=Phishing, 1=Legitimate):")
@@ -917,15 +867,7 @@ def evaluate_models(models, X_test, y_test, output_dir="reports"):
             continue
 
         if name == "ANN":
-            # ──────────────────────────────────────────────────
-            # BUG FIX 2 (evaluation):
-            # ANN sigmoid outputs P(Legitimate) because labels
-            # are now correctly binary (phishing=0, legit=1).
-            # P(Phishing) = 1 - sigmoid_output.
-            # We compute phishing_prob for ROC/AUC (higher = more
-            # likely phishing) to match the convention used for
-            # RF and SVM where phishing_prob = 1 - P(legitimate).
-            # ──────────────────────────────────────────────────
+        
             legit_probs   = model.predict(X_test, verbose=0).flatten()
             phishing_probs = 1.0 - legit_probs          # P(phishing)
             probs = phishing_probs
@@ -1069,25 +1011,13 @@ def print_url_report(url, phishing_prob, features_dict, show_features=False):
 
 def get_single_phishing_probability(model, X_pca, model_name):
     """
-    Return P(phishing) for a single sample.
-
     ANN: sigmoid output = P(legitimate) because labels were mapped to
          phishing=0, legit=1.  So P(phishing) = 1 - sigmoid_output.
 
-    RF / SVM: predict_proba columns are ordered by model.classes_ = [0, 1].
-              Column 0 = P(phishing=0 class), Column 1 = P(legitimate=1 class).
-              P(phishing) = predict_proba[:, 0].
     """
     if model_name == "ANN":
-        # ──────────────────────────────────────────────────────
-        # BUG FIX 3 (single-URL prediction):
-        # Original code did "return 1 - ann_prob" which was correct
-        # in intent but the model was also being trained on -1/1 labels
-        # (Bug 1), so the ANN learned an inverted mapping.
-        # Now that labels are remapped (phishing=0, legit=1):
-        #   sigmoid output → P(legit)
-        #   P(phishing)    = 1 - sigmoid output   ← this is now correct
-        # ──────────────────────────────────────────────────────
+       
+       
         legit_prob = float(model.predict(X_pca, verbose=0)[0][0])
         return 1.0 - legit_prob          # P(phishing)
 
