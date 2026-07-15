@@ -1016,8 +1016,6 @@ def get_single_phishing_probability(model, X_pca, model_name):
 
     """
     if model_name == "ANN":
-       
-       
         legit_prob = float(model.predict(X_pca, verbose=0)[0][0])
         return 1.0 - legit_prob          # P(phishing)
 
