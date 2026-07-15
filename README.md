@@ -9,7 +9,7 @@ A production-grade phishing detection system that extracts **30 URL-based featur
 ## 🚀 Live Application
 
 🎨 **Streamlit Frontend:**
-👉 [https://phishnet-wcabthwpqbygrtzxvzemnk.streamlit.app/](https://phishnet-erwz2a34gdc7yxbhujzkpl.streamlit.app)
+👉 [https://warm-alfajores-28020c.netlify.app/](https://warm-alfajores-28020c.netlify.app/)
 
 ⚙️ **FastAPI Backend:**
 👉 [https://phishnet-t6pj.onrender.com/docs](https://phishnet-t6pj.onrender.com/docs)
