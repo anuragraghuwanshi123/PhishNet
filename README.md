@@ -8,7 +8,7 @@ A production-grade phishing detection system that extracts **30 URL-based featur
 
 ## 🚀 Live Application
 
-🎨 **Streamlit Frontend:**
+🎨 **React Frontend:**
 👉 [https://warm-alfajores-28020c.netlify.app/](https://warm-alfajores-28020c.netlify.app/)
 
 ⚙️ **FastAPI Backend:**
