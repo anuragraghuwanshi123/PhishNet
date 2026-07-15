@@ -1,33 +1,33 @@
-fastapi==0.116.1
-uvicorn==0.35.0
+fastapi
+uvicorn
 
-tensorflow==2.16.1
-keras==3.11.1
+tensorflow
+keras
 
-numpy==1.26.4
-pandas==2.3.0
-scikit-learn==1.7.0
-joblib==1.5.1
+numpy
+pandas
+scikit-learn
+joblib
 
-redis==6.2.0
-python-dotenv==1.1.0
+redis
+python-dotenv
 
-prometheus-fastapi-instrumentator==7.1.0
+prometheus-fastapi-instrumentator
 
-requests==2.32.4
-beautifulsoup4==4.13.4
-python-whois==0.9.5
-dnspython==2.7.0
+requests
+beautifulsoup4
+python-whois
+dnspython
 
-python-jose==3.5.0
-passlib==1.7.4
-bcrypt==4.3.0
+python-jose
+passlib
+bcrypt
 
-streamlit==1.45.1
+streamlit
 
-matplotlib==3.10.3
-seaborn==0.13.2
+matplotlib
+seaborn
 
-python-multipart==0.0.20
+python-multipart
 
-xgboost==3.0.2
+xgboost
