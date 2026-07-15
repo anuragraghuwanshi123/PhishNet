@@ -8,7 +8,7 @@ A production-grade phishing detection system that extracts **30 URL-based featur
 
 ## 🚀 Live Application
 
-🎨 **React Frontend:**
+🎨 **Streamlit Frontend:**
 👉 [https://phishnet-t8qnh7cszrfv8s6qtwrlln.streamlit.app/](https://phishnet-t8qnh7cszrfv8s6qtwrlln.streamlit.app/)
 
 ⚙️ **FastAPI Backend:**
